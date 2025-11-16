@@ -14,19 +14,19 @@ const api = axios.create({
   timeout: 10000,
 })
 
-// Interceptor para adicionar o token de autenticação (JWT) em todas as requisições
+// Interceptor para adicionar o token de autenticação em todas as requisições
 api.interceptors.request.use((config) => {
-  // Pega o token do localStorage (onde ele será salvo após o login)
-  const token = localStorage.getItem('qualifica_saude_token'); 
+  // Pega o token do localStorage, onde ele será salvo após o login
+  const token = localStorage.getItem('qualifica_saude_token') 
   
   if (token) {
-    // Adiciona o token no header de Autorização (padrão Bearer)
-    config.headers.Authorization = `Bearer ${token}`;
+    // Adiciona o token no header de Autorização
+    config.headers.Authorization = `Bearer ${token}`
   }
-  return config;
+  return config
 }, (error) => {
-  return Promise.reject(error);
-});
+  return Promise.reject(error)
+})
 
 
-export default api;
+export default api

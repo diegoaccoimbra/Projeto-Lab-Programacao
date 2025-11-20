@@ -1,53 +1,48 @@
-// src/components/FiltroFila.jsx
+import React, { useState } from 'react'
 
-import React, { useState } from 'react';
+// Opções de filtro de status e especialidade para o painel
+const STATUS_OPTIONS = ['Todos', 'Aprovada', 'Não Aprovada', 'Pendente']
+const ESPECIALIDADE_OPTIONS = ['Todas', 'Cardiologia', 'Neurologia', 'Psicologia', 'Ortopedia']
 
-const STATUS_OPTIONS = ['Todos', 'Pendente', 'Aprovada', 'Não Aprovada'];
-const ESPECIALIDADE_OPTIONS = ['Todas', 'Cardiologia', 'Neurologia', 'Psicologia', 'Ortopedia'];
-
-/**
- * Componente de interface para os filtros de fila (RF6).
- * @param {function} onFilterChange - Função de callback para passar os filtros ao componente pai.
- */
+// Componente que recebe uma função de callback para passar os filtros pro componente pai
 const FiltroFila = ({ onFilterChange }) => {
-  const [status, setStatus] = useState('Todos');
-  const [especialidade, setEspecialidade] = useState('Todas');
+  const [status, setStatus] = useState('Todos')
+  const [especialidade, setEspecialidade] = useState('Todas')
 
-  // Função para disparar a atualização dos filtros
+  // Função para a atualização dos filtros com os valores atuais sendo enviados para o componente pai
   const handleApplyFilters = (newStatus = status, newEspecialidade = especialidade) => {
-    onFilterChange({ status: newStatus, especialidade: newEspecialidade });
-  };
+    onFilterChange({ status: newStatus, especialidade: newEspecialidade })
+  }
 
-  // Funções de mudança de estado
+  // Funções de mudança de estado com base no que o usuário seleciona em "status" e "especialidade"
   const handleStatusChange = (e) => {
-    const newStatus = e.target.value;
-    setStatus(newStatus);
-    handleApplyFilters(newStatus, especialidade); // Aplica o filtro imediatamente
-  };
+    const newStatus = e.target.value
+    setStatus(newStatus)
+    // Notifica o componente pai sobre a mudança de filtro
+    handleApplyFilters(newStatus, especialidade)
+  }
 
   const handleEspecialidadeChange = (e) => {
-    const newEspecialidade = e.target.value;
-    setEspecialidade(newEspecialidade);
-    handleApplyFilters(status, newEspecialidade); // Aplica o filtro imediatamente
-  };
+    const newEspecialidade = e.target.value
+    setEspecialidade(newEspecialidade)
+    handleApplyFilters(status, newEspecialidade)
+  }
 
+  // Container dos filtros, que reage a cada mudança do usuário e mapeia as opção nos arrays definidos anteriormente
   return (
-    <div className="filtros-container" style={{ display: 'flex', gap: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '5px', marginBottom: '20px' }}>
-      
-      {/* Filtro por Status */}
+    <div className = "filtros-container">
       <div>
-        <label htmlFor="status-filter" style={{ fontWeight: 'bold' }}>Filtrar por Status:</label>
-        <select id="status-filter" value={status} onChange={handleStatusChange} style={{ marginLeft: '10px', padding: '5px' }}>
+        <label htmlFor = "status-filter">Filtrar por Status:</label>
+        <select id = "status-filter" value = {status} onChange = {handleStatusChange}>
           {STATUS_OPTIONS.map(opt => (
-            <option key={opt} value={opt}>{opt}</option>
+            <option key = {opt} value = {opt}>{opt}</option>
           ))}
         </select>
       </div>
 
-      {/* Filtro por Especialidade */}
       <div>
-        <label htmlFor="especialidade-filter" style={{ fontWeight: 'bold' }}>Filtrar por Especialidade:</label>
-        <select id="especialidade-filter" value={especialidade} onChange={handleEspecialidadeChange} style={{ marginLeft: '10px', padding: '5px' }}>
+        <label htmlFor = "especialidade-filter">Filtrar por Especialidade:</label>
+        <select id = "especialidade-filter" value = {especialidade} onChange = {handleEspecialidadeChange}>
           {ESPECIALIDADE_OPTIONS.map(opt => (
             <option key={opt} value={opt}>{opt}</option>
           ))}
@@ -55,7 +50,7 @@ const FiltroFila = ({ onFilterChange }) => {
       </div>
       
     </div>
-  );
-};
+  )
+}
 
-export default FiltroFila;
+export default FiltroFila

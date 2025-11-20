@@ -1,4 +1,4 @@
-import api from './services'
+import api from './api'
 
 // Procura a fila de pacientes para qualificação
 export const fetchFilaQualificacao = async (filtros) => {

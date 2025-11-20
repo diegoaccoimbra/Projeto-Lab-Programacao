@@ -1,4 +1,4 @@
-import api from './services'
+import api from './api'
 import axios from 'axios'
 
 // Faz o login buscando o token e os dados do usuário

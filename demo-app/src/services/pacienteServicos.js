@@ -1,4 +1,4 @@
-import api from './services'
+import api from './api'
 
 // Busca os dados da solicitação e documentos necessários do paciente logado
 export const fetchSolicitacaoDoPaciente = async (idPaciente) => {

@@ -1,140 +1,142 @@
-// src/components/QualificacaoDetalhe.jsx
+import React, { useState, useEffect } from 'react'
+import { fetchDetalheSolicitacao, qualificarSolicitacao } from '../services/profissionalServicos'
 
-import React, { useState, useEffect } from 'react';
-import { fetchDetalheSolicitacao, qualificarSolicitacao } from '../api/profissionalServicos';
+// Array que lista o status de qualificação de uma solicitação
+const STATUS_QUALIFICACAO = ['Aprovada', 'Não Aprovada']
 
-const STATUS_QUALIFICACAO = ['Aprovada', 'Não Aprovada'];
-
-/**
- * Módulo de Análise e Qualificação (RF3).
- * @param {number} solicitacaoId - ID da solicitação a ser analisada.
- * @param {function} onClose - Função para fechar o modal/tela de detalhe.
- * @param {function} onQualifySuccess - Callback para atualizar a fila após a qualificação.
- */
+// Componente que recebe 3 props do componente pai PainelProfissionalSaude.js: o id da solicitação, uma função pra fechar a tela de detalhe da solicitação e uma função de callback para atualizar a fila após a qualificação
 const QualificacaoDetalhe = ({ solicitacaoId, onClose, onQualifySuccess }) => {
-  const [detalhe, setDetalhe] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [loadingQualificacao, setLoadingQualificacao] = useState(false);
-  const [statusDecisao, setStatusDecisao] = useState('');
-  const [justificativa, setJustificativa] = useState('');
-  const [message, setMessage] = useState('');
+  const [detalhe, setDetalhe] = useState(null) // Detalhe da solicitação
+  const [loading, setLoading] = useState(true) // Carregamento da tela de detalhes
+  const [loadingQualificacao, setLoadingQualificacao] = useState(false) // Estado de envio da decisão (pra desabilitar o botão)
+  const [statusDecisao, setStatusDecisao] = useState('') // Decisão "aprovada" ou "não aprovada"
+  const [justificativa, setJustificativa] = useState('') // Texto da justificativa
+  const [message, setMessage] = useState('') // Mensagens para o usuário
 
-  // 1. Carrega os detalhes da solicitação e os documentos
+  // Carrega os detalhes da solicitação e os documentos
   useEffect(() => {
     const loadDetalhes = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const data = await fetchDetalheSolicitacao(solicitacaoId);
-        setDetalhe(data);
-        setStatusDecisao(data.status); // Define o status inicial como o status atual
-      } catch (error) {
-        setMessage('Erro ao carregar detalhes da solicitação.');
-      } finally {
-        setLoading(false);
+        // Chama função axios pra buscar os dados no back-end
+        const data = await fetchDetalheSolicitacao(solicitacaoId)
+        setDetalhe(data)
+        // Define o status inicial como o status atual
+        setStatusDecisao(data.status) 
       }
-    };
-    loadDetalhes();
-  }, [solicitacaoId]);
+      catch (error) {
+        setMessage('Erro ao carregar os detalhes da solicitação.')
+      }
+      finally {
+        setLoading(false)
+      }
+    }
+    loadDetalhes()
+  }, [solicitacaoId])
 
 
-  // 2. Lógica para submeter a qualificação
+  // Função para submeter a qualificação
   const handleQualificar = async () => {
+    // Verifica se um status foi definido
     if (!statusDecisao) {
-      setMessage('Selecione um status de qualificação.');
-      return;
+      setMessage('Selecione um status de qualificação.')
+      return
     }
 
+    // Exibe mensagem de justificativa para caso a solicitação não tenha sido qualificada
     if (statusDecisao === 'Não Aprovada' && justificativa.trim() === '') {
-      setMessage('🚨 A justificativa é obrigatória para reprovação.');
-      return;
+      setMessage('A justificativa é obrigatória para reprovação.')
+      return
     }
 
-    setLoadingQualificacao(true);
-    setMessage('⏳ Salvando qualificação...');
+    // Mensagem exibida logo após submeter a qualificação
+    setLoadingQualificacao(true)
+    setMessage('Salvando qualificação...')
+
 
     try {
-      const result = await qualificarSolicitacao(solicitacaoId, statusDecisao, justificativa);
-      setMessage(result.mensagem);
+      // Chama a função axios para enviar o status e a justificativa para o back-end
+      const result = await qualificarSolicitacao(solicitacaoId, statusDecisao, justificativa)
+      setMessage(result.mensagem)
       
-      // Notifica o pai para atualizar a fila e fecha
-      onQualifySuccess(solicitacaoId, result.newStatus); 
-      setTimeout(onClose, 1500); // Fecha após 1.5s
+      // Notifica o pai PainelProfissionalSaude.js para atualizar a fila
+      onQualifySuccess(solicitacaoId, result.newStatus) 
+      // Fecha após 1.5s
+      setTimeout(onClose, 1500)
       
-    } catch (error) {
-      setMessage(`❌ Erro: ${error.message || 'Falha ao qualificar.'}`);
-    } finally {
-      setLoadingQualificacao(false);
+    } 
+    catch (error) {
+      setMessage(`Erro: ${error.message || 'Falha ao qualificar.'}`)
+    } 
+    finally {
+      setLoadingQualificacao(false)
     }
-  };
+  }
 
 
-  if (loading) return <div>Carregando detalhes do paciente...</div>;
-  if (!detalhe) return <div>Detalhes não encontrados.</div>;
+  // A interface só exibida após os dados serem carregados
+  if (loading) {
+    return <div>Carregando detalhes do paciente...</div>
+  }
+  if (!detalhe) {
+    return <div>Os detalhes não foram encontrados.</div>
+  }
 
+  // Container de detalhe da solicitação
   return (
-    <div className="qualificacao-detalhe-container" style={{ padding: '20px', border: '2px solid #007bff', borderRadius: '8px', maxWidth: '800px', margin: '20px auto' }}>
+    <div className = "qualificacao-detalhe-container">
       
-      <button onClick={onClose} style={{ float: 'right' }}>X Fechar</button>
-      <h2>🔎 Análise de Solicitação ID: {detalhe.id}</h2>
-      <h3>Paciente: **{detalhe.paciente}** | Especialidade: **{detalhe.especialidade}**</h3>
+      <button className = 'qualificacao-fechar-button' onClick = {onClose}>X</button>
+      <h2>Detalhe da solicitação ID: {detalhe.id}</h2>
+      <h3>Paciente: {detalhe.paciente} | Especialidade: {detalhe.especialidade}</h3>
       
-      {/* Seção de Documentos (RF3) */}
-      <div style={{ margin: '20px 0', borderTop: '1px solid #ccc', paddingTop: '15px' }}>
-        <h4>📎 Documentos Anexados para Análise</h4>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+      <div className = 'documentos-anexados-container'>
+        <h4>Documentos anexados para análise</h4>
+        <div>
           {detalhe.documentos.map((doc, index) => (
-            <div key={index} style={{ border: '1px dashed #007bff', padding: '10px', backgroundColor: '#f9f9f9' }}>
-              **{doc.nome}**
-              <p style={{ color: doc.status === 'OK' ? 'green' : 'red' }}>Status (Simulado): {doc.status}</p>
-              {/* No mundo real, aqui seria um link para visualização ou um modal viewer */}
-              <a href={doc.link} target="_blank" rel="noopener noreferrer">Visualizar Documento</a>
+            <div className = 'documentos-anexados-div' key={index}>
+              {doc.nome}
+              <p style = {{ color: doc.status === 'OK' ? 'green' : 'red' }}>Status: {doc.status}</p>
+              <a href = {doc.link} target = "_blank">Visualizar Documento</a>
             </div>
           ))}
         </div>
       </div>
-      
-      <hr />
 
-      {/* Seção de Qualificação (RF3) */}
-      <div className="modulo-qualificacao">
-        <h4>✅ Decisão de Qualificação</h4>
-        
-        {/* Campo de Status */}
-        <div style={{ marginBottom: '10px' }}>
-          <label style={{ fontWeight: 'bold', display: 'block' }}>Status da Solicitação:</label>
-          <select value={statusDecisao} onChange={(e) => {
-            setStatusDecisao(e.target.value);
-            setMessage('');
-          }} disabled={loadingQualificacao}>
+      <div className = "modulo-qualificacao">
+        <h4>Decisão de Qualificação</h4>
+        <div className = 'status-solicitao-div'>
+          <label>Status da Solicitação:</label>
+          <select className = 'status-solicitacao-select' value={statusDecisao} onChange={(e) => {
+            setStatusDecisao(e.target.value)
+            setMessage('')
+          }} disabled = {loadingQualificacao}>
             {STATUS_QUALIFICACAO.map(status => (
-              <option key={status} value={status}>{status}</option>
+              <option key = {status} value = {status}>{status}</option>
             ))}
           </select>
         </div>
         
-        {/* Campo de Justificativa (RF3: Obrigatório se Não Aprovada) */}
         {statusDecisao === 'Não Aprovada' && (
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block' }}>Justificativa de Reprovação:</label>
+          <div>
+            <label>Justificativa de Reprovação:</label>
             <textarea
-              value={justificativa}
-              onChange={(e) => setJustificativa(e.target.value)}
-              placeholder="Ex: Documento ilegível, Exame desatualizado."
-              rows="3"
-              style={{ width: '100%', padding: '5px' }}
-              disabled={loadingQualificacao}
+              value = {justificativa}
+              onChange = {(e) => setJustificativa(e.target.value)}
+              placeholder = "Digite aqui a justificativa."
+              disabled = {loadingQualificacao}
             />
           </div>
         )}
         
-        <button onClick={handleQualificar} disabled={loadingQualificacao}>
-          {loadingQualificacao ? 'Processando...' : `Confirmar Qualificação: ${statusDecisao || '...'}`}
+        <button onClick = {handleQualificar} disabled = {loadingQualificacao}>
+          {loadingQualificacao ? 'Processando...' : `Confirmar Qualificação`}
         </button>
-        {message && <p style={{ marginTop: '10px', color: message.startsWith('❌') ? 'red' : 'green' }}>{message}</p>}
+        <p>{message}</p>
       </div>
 
     </div>
-  );
-};
+  )
+}
 
-export default QualificacaoDetalhe;
+export default QualificacaoDetalhe

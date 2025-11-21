@@ -166,7 +166,7 @@ const SecretariaSaude = () => {
             </header>
             
             <div className = "importar-container">
-                <h2>Importar Nova Fila</h2>
+                <h2>Importar nova fila</h2>
                 <p>Faça o upload do arquivo CSV ou XLSX para iniciar o ciclo de qualificação.</p>
                 
                 <div className = "input-group">

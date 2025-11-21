@@ -51,7 +51,7 @@
   "filaProfissional": [
     {
       "id": 1,
-      "nome": "João Paciente",
+      "nome": "João de Barros",
       "cpf": "111.111.111-11",
       "especialidade": "Cardiologia",
       "status": "Pendente",
@@ -60,7 +60,7 @@
     },
     {
       "id": 2,
-      "nome": "Maria Lima",
+      "nome": "Sandra Silva",
       "cpf": "555.555.555-55",
       "especialidade": "Dermatologia",
       "status": "Aprovada",
@@ -70,7 +70,7 @@
   ],
   "detalheSolicitacaoProfissional": {
     "id": 1,
-    "paciente": "João Paciente",
+    "paciente": "João de Barros",
     "especialidade": "Cardiologia",
     "status": "Pendente",
     "documentos": [

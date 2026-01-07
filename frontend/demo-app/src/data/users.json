@@ -1,0 +1,29 @@
+[
+    {
+        "identificacao": "111",
+        "senha": "123",
+        "user": {
+            "id": 1,
+            "nome": "Fernanda Sousa",
+            "perfil": "Paciente"
+        }
+    },
+    {
+        "identificacao": "222",
+        "senha": "123",
+        "user": {
+            "id": 2,
+            "nome": "Dr. Alberto",
+            "perfil": "Profissional"
+        }
+    },
+    {
+        "identificacao": "333",
+        "senha": "123",
+        "user": {
+            "id": 3,
+            "nome": "Shirley",
+            "perfil": "Secretaria"
+        }
+    }
+]

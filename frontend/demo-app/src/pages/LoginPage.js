@@ -89,6 +89,10 @@ const LoginPage = () => {
           {isLoading ? 'Acessando...' : 'Entrar no Sistema'}
         </button>
       </form>
+      
+      <div className = "cadastro-link">
+        <p><button onClick={() => navigate('/cadastro')}>Não tem uma conta? Cadastre-se agora</button></p>
+      </div>
     </div>
   )
 }

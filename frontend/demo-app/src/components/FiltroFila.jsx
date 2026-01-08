@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 // Opções de filtro de status e especialidade para o painel
 const STATUS_OPTIONS = ['Todos', 'Aprovada', 'Não Aprovada', 'Pendente']
-const ESPECIALIDADE_OPTIONS = ['Todas', 'Cardiologia', 'Neurologia', 'Psicologia', 'Ortopedia']
+const ESPECIALIDADE_OPTIONS = ['Todas', 'Oftalmologia', 'Cardiologia', 'Dermatologia','Neurologia', 'Psicologia', 'Ortopedia']
 
 // Componente que recebe uma função de callback para passar os filtros pro componente pai
 const FiltroFila = ({ onFilterChange }) => {

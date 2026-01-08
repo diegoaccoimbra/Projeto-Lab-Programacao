@@ -18,3 +18,25 @@ export const uploadDocumento = async (idSolicitacao, idDocumento, arquivo) => {
   
   return response.data
 }
+
+// Cadastra novo paciente
+export const cadastrarPaciente = async (dados) => {
+    const response = await api.post('/paciente/cadastro', dados)
+    return response.data
+}
+
+// Visualiza as solicitações já feitas
+export const fetchMinhasSolicitacoes = async () => {
+    const response = await api.get('/paciente/minhas-solicitacoes')
+    return response.data
+}
+
+// Cria uma nova solicitação
+export const criarSolicitacao = async (formData) => {
+    const response = await api.post('/solicitacoes', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return response.data
+}

@@ -1,25 +1,25 @@
 :root {
-  /* PALETA DE CORES PRINCIPAL */
-  --cor-fundo-tela: #aaeed3;
-  --cor-texto: #343a40;
-  --cor-primaria: #416E5C;
+  /* PALETA MINISTÉRIO DA SAÚDE / GOV.BR */
+  --cor-fundo-tela: #f0f2f5;
+  --cor-texto: #1a1a1a;
+  --cor-primaria: #004580;
   
   /* NEUTROS E FUNDOS */
   --cor-branco: #ffffff;
-  --cor-fundo-claro: #f7f9fc;
-  --cor-fundo-tabela: #e9ecef;
-  --cor-borda: #cccccc;
+  --cor-fundo-claro: #ffffff;
+  --cor-fundo-tabela: #f8f9fa;
+  --cor-borda: #d1d4d7;
 
   /* ESTADOS DE INTERAÇÃO */
-  --cor-hover: #0056b3;
+  --cor-hover: #003366;
   --cor-hover-secundario: #5a6268; 
-  --cor-desabilitado: #a0a0a0;
+  --cor-desabilitado: #ced4da;
   --cor-detalhe-azul: #007bff;
 
   /* STATUS E FEEDBACK */
-  --status-pendente: #ffff7b;
-  --status-aprovada: #56ff7e;
-  --status-nao-aprovada: #fc5263;
+  --status-pendente: #fff3cd;
+  --status-aprovada: #d4edda;
+  --status-nao-aprovada: #f8d7da;
   --status-fundo-erro: #f8d7da;
 
   /* LAYOUT */
@@ -56,16 +56,29 @@ input[type="text"], input[type="password"], select, textarea {
 
 button {
   background-color: var(--cor-primaria);
-  color: var(--cor-branco);
-  padding: 10px 15px;
+  color: var(--cor-branco) !important;
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 button:hover:not(:disabled) {
   background-color: var(--cor-hover);
+  transform: translateY(-1px);
+}
+
+/* Estilo para quando o botão do menu está selecionado (Aba Ativa) */
+button.active {
+  background-color: var(--cor-hover) !important;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,0.2);
+  border-bottom: 3px solid #ffd700; /* Detalhe em dourado */
 }
 
 button:disabled {
@@ -83,9 +96,9 @@ header button:hover:not(:disabled) {
 
 /* Mensagens de Status */
 .error-message {
-  color: var(--status-nao-aprovada);
+  color: #721c24;
   background-color: var(--status-fundo-erro);
-  border: 1px solid var(--status-nao-aprovada);
+  border: 1px solid #f5c6cb;
   padding: 10px;
   border-radius: 4px;
   margin-bottom: 15px;
@@ -103,6 +116,7 @@ header button:hover:not(:disabled) {
   background-color: var(--cor-branco);
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-top: 6px solid var(--cor-primaria);
 }
 
 .login-page-container h2 {
@@ -114,6 +128,12 @@ header button:hover:not(:disabled) {
   width: 100%;
   margin: 10px 0px;
   font-size: 1.1em;
+}
+
+.cadastro-link button {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9em;
 }
 
 /* 2. PortalPaciente.js / PainelProfissionalSaude.js / SecretariaSaude.js */
@@ -147,20 +167,56 @@ header button:hover:not(:disabled) {
 
 .status-pendente {
   background-color: var(--status-pendente);
-  color: var(--cor-texto);
+  color: #856404;
 }
 .status-aprovada {
   background-color: var(--status-aprovada);
-  color: var(--cor-texto);
+  color: #155724;
 }
 .status-nao-aprovada {
   background-color: var(--status-nao-aprovada);
-  color: var(--cor-texto);
+  color: #721c24;
 }
 
-/* 2.1 PortalPaciente.js */
+/* 2.1 PortalPaciente.js - Listas e Cards */
+.solicitacao-card {
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background-color: #fdfdfd;
+}
+
+.solicitacao-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.solicitacao-data {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+}
+
+.portal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+/* Botão de envio específico do formulário */
+.submit-button {
+  padding: 12px !important;
+  background-color: #28a745 !important; /* Verde para sucesso/envio */
+  color: white !important;
+  border-radius: 5px !important;
+}
+
 .documento-item {
   background-color: var(--cor-fundo-claro);
+  border: 1px solid var(--cor-borda);
   border-left: 5px solid var(--cor-primaria);
   padding: 10px;
   margin: 10px 0px;
@@ -177,6 +233,45 @@ header button:hover:not(:disabled) {
   border-left: 3px solid var(--cor-detalhe-azul);
   padding-left: 10px;
   margin-bottom: 5px;
+}
+
+/* Container do Menu */
+.portal-nav {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--cor-primaria); /* Linha azul que atravessa o menu */
+}
+
+/* Estilo Base dos Botões do Menu (Não Selecionada) */
+.nav-button {
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none !important;
+  
+  /* Azul Claro com Texto Branco conforme solicitado */
+  background-color: #88b2daff !important; 
+  color: #ffffff !important; 
+  
+  font-weight: bold;
+  transition: all 0.2s ease;
+  border-radius: 4px 4px 0 0; /* Arredondado apenas em cima para parecer aba */
+  margin-right: 5px;
+}
+
+/* ABA ATIVA (Selecionada) */
+.nav-button.active {
+  /* Azul Escuro com Texto Branco conforme solicitado */
+  background-color: var(--cor-primaria) !important; 
+  color: #ffffff !important;
+  
+  /* Destaque visual para a aba ativa */
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+  border-bottom: none !important; 
+}
+
+/* Efeito Hover para melhorar a interatividade */
+.nav-button:hover {
+  filter: brightness(90%);
 }
 
 /* 2.2 PainelProfissionalSaude.js */
@@ -201,9 +296,9 @@ header button:hover:not(:disabled) {
   border-bottom: 1px solid var(--cor-fundo-tabela);
 }
 .fila-tabela th {
-  background-color: var(--cor-fundo-tabela);
+  background-color: var(--cor-primaria);
   font-weight: bold;
-  color: var(--cor-texto);
+  color: var(--cor-branco);
 }
 .fila-tabela tr {
   border-bottom: 1px solid var(--cor-borda);
@@ -237,6 +332,18 @@ header button:hover:not(:disabled) {
   float: right;
 }
 
+.qualificar-button {
+  background-color: #f39c12 !important; /* Laranja para atenção */
+  color: white !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  border-radius: 4px;
+}
+
+.qualificar-button:hover {
+  background-color: #e67e22 !important;
+}
+
 .documentos-anexados-container {
   margin: 20px 0px;
   border-top: 1px solid var(--cor-borda);
@@ -263,6 +370,6 @@ header button:hover:not(:disabled) {
 }
 
 .select-format {
-  width: 80px;
+  width: 120px; /* Ajustado para caber o texto */
   margin-right: 30px;
 }

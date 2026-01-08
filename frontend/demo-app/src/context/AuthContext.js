@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
         isLoading,
         login,
         logout,
-        isAuthenticated: user ? true : false
+        isAuthenticated: !!user
     }
 
     // AuthContext.Provider fornece o objeto contextValue para os componentes filhos

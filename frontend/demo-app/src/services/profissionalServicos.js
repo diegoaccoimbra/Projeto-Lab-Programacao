@@ -2,7 +2,6 @@ import api from './api'
 
 // Procura a fila de pacientes para qualificação
 export const fetchFilaQualificacao = async (filtros) => {
-  // Envia os filtros como parâmetros de query string: /profissional/fila?status=Pendente&especialidade=Cardiologia
   const response = await api.get('/profissional/fila', { params: filtros })
   return response.data
 }

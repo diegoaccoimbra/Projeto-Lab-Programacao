@@ -24,6 +24,7 @@ const PortalPaciente = () => {
     const [novoMotivo, setNovoMotivo] = useState('')
     const [arquivos, setArquivos] = useState([])
     const [enviando, setEnviando] = useState(false)
+    const [mensagemErro, setMensagemErro] = useState('') // Estado para erro visual
 
     const loadSolicitacoes = useCallback(async () => {
         setLoading(true)
@@ -32,7 +33,7 @@ const PortalPaciente = () => {
             setSolicitacoes(data)
         } 
         catch (err) {
-            console.error(err)
+            console.error("Erro ao carregar:", err)
         } 
         finally {
             setLoading(false)
@@ -48,24 +49,33 @@ const PortalPaciente = () => {
     const handleNovaSolicitacao = async (e) => {
         e.preventDefault()
         setEnviando(true)
+        setMensagemErro('')
         
-        // Simulação de FormData para upload de arquivos
+        // FormData para upload de arquivos
         const formData = new FormData()
         formData.append('especialidade', novaEspecialidade)
         formData.append('motivo', novoMotivo)
-        arquivos.forEach(file => formData.append('arquivos', file))
+        
+        // Anexa cada arquivo individualmente com o mesmo nome 'arquivos'
+        arquivos.forEach(file => {
+            formData.append('arquivos', file)
+        })
 
         try {
             await criarSolicitacao(formData)
+            
+            // Limpa o formulário em caso de sucesso
             setNovaEspecialidade('')
             setNovoMotivo('')
             setArquivos([])
             setAbaAtiva('lista')
             loadSolicitacoes()
-            alert('Solicitação e documentos enviados com sucesso!')
+            alert('Solicitação enviada com sucesso!')
         } 
         catch (err) {
-            alert('Erro ao criar solicitação.')
+            console.error("Erro detalhado:", err)
+            const msg = err.response?.data?.message || 'Erro ao conectar com o servidor.'
+            setMensagemErro(msg)
         } 
         finally {
             setEnviando(false)
@@ -75,7 +85,7 @@ const PortalPaciente = () => {
     return (
         <div className = "portal-paciente-container">
             <header className = "portal-header">
-                <h1>Olá, {user.nome}!</h1>
+                <h1>Olá, {user ? user.nome : 'Paciente'}!</h1>
                 <button onClick = {logout} className = "logout-button">Sair</button>
             </header>
 
@@ -91,23 +101,25 @@ const PortalPaciente = () => {
             {abaAtiva === 'lista' ? (
                 <section className = "portal-section">
                     <h2>Histórico de solicitações</h2>
+                    {loading && <p>Carregando...</p>}
+                    {!loading && solicitacoes.length === 0 && <p>Nenhuma solicitação encontrada.</p>}
+                    
                     {solicitacoes.map((sol) => (
                         <div key = {sol.id} className = "solicitacao-card">
                             <div className = "solicitacao-card-header">
                                 <strong>{sol.especialidade}</strong>
-                                <span className = {`status-badge status-${sol.statusAtual.toLowerCase().replace(' ', '-')}`}>
+                                <span className = {`status-badge status-${sol.statusAtual.toLowerCase().replace(/\s+/g, '-')}`}>
                                     {sol.statusAtual}
                                 </span>
                             </div>
                             <p className = "solicitacao-data">Data: {sol.data}</p>
                             
-                            {/* Histórico de Atualizações */}
                             <div className = "historico-atualizacoes">
                                 <small><strong>Histórico:</strong></small>
                                 <ul>
                                     {sol.historico?.map((h, i) => (
                                         <li key = {i}>{h.data}: {h.mensagem}</li>
-                                    )) || <li>Solicitação recebida pelo sistema.</li>}
+                                    )) || <li>Aguardando análise.</li>}
                                 </ul>
                             </div>
                         </div>
@@ -116,6 +128,13 @@ const PortalPaciente = () => {
             ) : (
                 <section className = "portal-section">
                     <h2>Nova Solicitação</h2>
+                    
+                    {mensagemErro && (
+                        <div style={{padding: '10px', backgroundColor: '#ffebee', color: '#c62828', marginBottom: '15px', borderRadius: '4px'}}>
+                            {mensagemErro}
+                        </div>
+                    )}
+
                     <form onSubmit = {handleNovaSolicitacao} className = "portal-form">
                         <div className = "form-group">
                             <label>Especialidade:</label>
@@ -134,7 +153,6 @@ const PortalPaciente = () => {
                             </select>
                         </div>
 
-                        {/* Exibição dinâmica de requisitos */}
                         {novaEspecialidade && (
                             <div className = "requisitos-box">
                                 <strong>Documentos Obrigatórios:</strong>

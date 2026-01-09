@@ -96,11 +96,10 @@ const PainelProfissionalSaude = () => {
                     {paciente.status}
                   </span>
                 </td>
-                <td>
+                <td className="acoes-coluna">
                   <button 
-                    className="qualificar-button" 
+                    className={paciente.status === 'Pendente' ? 'qualificar-button' : 'visualizar-button'} 
                     onClick={() => setSelectedSolicitacaoId(paciente.id)}
-                    /* A cor agora é controlada pela classe, mas mantemos o texto dinâmico */
                   >
                     {paciente.status === 'Pendente' ? 'Qualificar' : 'Visualizar'}
                   </button>

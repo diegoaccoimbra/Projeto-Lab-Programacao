@@ -3,6 +3,7 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
+# Tabela dos usuários
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     nome = db.Column(db.String(100), nullable = False)
@@ -10,6 +11,7 @@ class User(db.Model):
     senha = db.Column(db.String(200), nullable = False)
     perfil = db.Column(db.String(20), nullable = False) 
 
+# Tabela de solicitações
 class Solicitacao(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     paciente_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
@@ -23,6 +25,7 @@ class Solicitacao(db.Model):
     # Relacionamento com Documentos
     documentos = db.relationship('Documento', backref='solicitacao', lazy = True)
 
+# Tabela de documentos
 class Documento(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     solicitacao_id = db.Column(db.Integer, db.ForeignKey('solicitacao.id'), nullable = False)

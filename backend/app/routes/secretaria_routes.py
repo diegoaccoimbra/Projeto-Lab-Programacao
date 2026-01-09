@@ -7,7 +7,7 @@ import datetime
 
 secretaria_bp = Blueprint('secretaria', __name__)
 
-# RF1: Importação de fila via CSV
+# Importação de fila via arquivo CSV
 @secretaria_bp.route('/importar', methods = ['POST'])
 @jwt_required()
 def importar_fila():
@@ -19,19 +19,19 @@ def importar_fila():
         return jsonify({"message": "Formato inválido. Use CSV."}), 400
 
     try:
-        # Lê o arquivo CSV
+        # O flask recebe o arquivo, lê os dados binários e os transforma em texto
         stream = io.StringIO(file.stream.read().decode("UTF8"), newline = None)
+        # Converte cada linha do csv em um dicionário Python
         csv_input = csv.DictReader(stream)
         
         count = 0
         for row in csv_input:
-            # Exemplo de CSV: Nome,CPF,Especialidade,Motivo
-            # Verifica se o usuário já existe, se não, cria (simplificado)
+            # Verifica se o usuário já existe por meio do CPF
             cpf = row.get('CPF')
             user = User.query.filter_by(identificacao = cpf).first()
             
             if not user:
-                # Cria usuário temporário
+                # Cria um usuário temporário
                 from flask_bcrypt import Bcrypt
                 bcrypt = Bcrypt()
                 user = User(
@@ -53,16 +53,20 @@ def importar_fila():
             )
             db.session.add(sol)
             count += 1
-            
+
+        # Salva as mudanças no banco    
         db.session.commit()
         return jsonify({"message": f"{count} pacientes importados com sucesso!"}), 201
 
     except Exception as e:
         return jsonify({"message": f"Erro na importação: {str(e)}"}), 500
 
+
+# Rota pra visualizar a fila final
 @secretaria_bp.route('/fila-final', methods = ['GET'])
 @jwt_required()
 def fila_final():
+    # Filtra somente as solicitações que foram aprovadas
     sols = Solicitacao.query.filter_by(status = 'Aprovada').all()
     return jsonify([{
         "id": s.id,
@@ -73,17 +77,22 @@ def fila_final():
         "profissional": "Dr. Alberto"
     } for s in sols]), 200
 
+
+# Rota pra exportar a fila final
 @secretaria_bp.route('/exportar', methods = ['GET'])
 @jwt_required()
 def exportar():
-    # RF4: Exportar CSV
+    # Exporta um CSV com a fila das solicitações aprovadas
     sols = Solicitacao.query.filter_by(status = 'Aprovada').all()
     
+    # Gera o arquivo
     output = io.StringIO()
     writer = csv.writer(output)
     
+    # Cabeçalho do CSV
     writer.writerow(['ID', 'Paciente', 'CPF', 'Especialidade', 'Status'])
     
+    # Preenchendo as linhas do arquivo
     for s in sols:
         p = User.query.get(s.paciente_id)
         writer.writerow([s.id, p.nome, p.identificacao, s.especialidade, s.status])
@@ -94,4 +103,5 @@ def exportar():
     mem.write(output.getvalue().encode('utf-8'))
     mem.seek(0)
     
+    # Baixa o arquivo CSV
     return send_file(mem, mimetype="text/csv", as_attachment = True, download_name="fila_aprovados.csv")

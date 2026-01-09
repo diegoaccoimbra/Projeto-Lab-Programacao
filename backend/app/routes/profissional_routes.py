@@ -5,6 +5,7 @@ from app.models import db, Solicitacao, User, Documento
 
 profissional_bp = Blueprint('profissional', __name__)
 
+# Lista a tabela que o profissional de saúde visualiza
 @profissional_bp.route('/fila', methods = ['GET'])
 @jwt_required()
 def listar_fila():
@@ -13,18 +14,19 @@ def listar_fila():
 
     query = Solicitacao.query
 
-    # RF6: Filtros
+    # Filtros
     if status_filtro and status_filtro != 'Todos':
         query = query.filter_by(status=status_filtro)
     
     if especialidade_filtro and especialidade_filtro != 'Todas':
         query = query.filter_by(especialidade = especialidade_filtro)
     
+    # Lista as solicitações
     sols = query.all()
     resultado = []
     for s in sols:
         p = User.query.get(s.paciente_id)
-        # Contar documentos
+        # Contador de documentos anexados na solicitaçõa
         qtd_docs = Documento.query.filter_by(solicitacao_id = s.id).count()
         
         resultado.append({
@@ -37,7 +39,8 @@ def listar_fila():
         })
     return jsonify(resultado), 200
 
-# Rota para obter detalhes completos e links dos documentos
+
+# Rota para ver os detalhes da solicitação
 @profissional_bp.route('/solicitacoes/<int:id>', methods = ['GET'])
 @jwt_required()
 def detalhe_solicitacao(id):
@@ -53,22 +56,31 @@ def detalhe_solicitacao(id):
         "documentos": [{
             "nome": d.nome_arquivo,
             "status": "OK", 
-            # Link para o frontend baixar o arquivo
+            # Link para o frontend baixar o arquivo anexado pelo paciente
             "link": f"http://localhost:5000/api/profissional/documentos/{d.caminho_arquivo}"
         } for d in docs]
     }), 200
 
-# Rota para servir o arquivo físico
+
+# Rota para entregar o arquivo ao navegador
 @profissional_bp.route('/documentos/<filename>')
 def serve_file(filename):
+    # O flask pega o arquivo em UPLOAD_FOLDER e entrega ao navegador
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
+
+# Rota para qualificar a solicitação
 @profissional_bp.route('/solicitacoes/<int:id>/qualificar', methods = ['PUT'])
 @jwt_required()
 def qualificar(id):
     data = request.get_json()
+    
+    # O profissional de saúde envia  os dados de status e a justificativa
     sol = Solicitacao.query.get_or_404(id)
     sol.status = data.get('status')
     sol.justificativa = data.get('justificativa')
+    
+    # Salva a atualização da solicitação no banco
     db.session.commit()
+
     return jsonify({"message": "Qualificação salva com sucesso", "newStatus": sol.status}), 200

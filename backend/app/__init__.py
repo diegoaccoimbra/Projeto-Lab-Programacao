@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -6,16 +7,27 @@ from app.models import db, User, Solicitacao
 
 def create_app():
     app = Flask(__name__)
+    
+    # Configuração do Caminho Absoluto para salvar arquivos
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    upload_folder = os.path.join(basedir, '..', 'uploads')
+    
+    # Cria a pasta se não existir
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
+
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///qualifica_saude.db'
     app.config['JWT_SECRET_KEY'] = 'chave-secreta-projeto'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = upload_folder
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
     CORS(app)
     db.init_app(app)
     JWTManager(app)
     bcrypt = Bcrypt(app)
 
-    # Registro das Rotas
+    # Registro das rotas
     from app.routes.auth_routes import auth_bp
     from app.routes.paciente_routes import paciente_bp
     from app.routes.profissional_routes import profissional_bp
@@ -39,10 +51,6 @@ def create_app():
             u3 = User(nome = "Dr. Alberto Medeiros", identificacao = "888", perfil = "Profissional", senha = h_medico)
             
             db.session.add_all([u1, u2, u3])
-            db.session.commit()
-
-            s1 = Solicitacao(paciente_id = u3.id, especialidade = "Cardiologia", motivo = "Dor no peito", unidade = "UBS Central", status = "Pendente")
-            db.session.add(s1)
             db.session.commit()
 
     return app
